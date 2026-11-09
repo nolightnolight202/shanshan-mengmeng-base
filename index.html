@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="珊珊和萌萌的小基地 —— 记录我们恋爱经过的地方">
+<title>珊珊和萌萌的小基地</title>
+<style>
+/* ============ 低饱和度柔和配色（每次访问随机一套，访问期间保持） ============ */
+:root{
+  --radius:18px;
+  --shadow:0 10px 30px rgba(0,0,0,.08);
+  --shadow-soft:0 4px 14px rgba(0,0,0,.06);
+  --font-serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --font-sans:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+html[data-palette="0"]{ /* 樱花粉 */
+  --bg:#f6eeee; --bg2:#fbf7f6; --card:#fffdfc; --ink:#5c4a4a; --ink-soft:#9a8484;
+  --accent:#c99a9a; --accent-deep:#a97c7c; --accent-soft:#f0e0e0; --line:#e8d8d8;
+}
+html[data-palette="1"]{ /* 雾蓝 */
+  --bg:#eaeff3; --bg2:#f6f8fa; --card:#fdfefe; --ink:#46545e; --ink-soft:#8295a1;
+  --accent:#96aebe; --accent-deep:#7391a4; --accent-soft:#dfe8ee; --line:#d8e1e8;
+}
+html[data-palette="2"]{ /* 奶油米 */
+  --bg:#f4f0e7; --bg2:#faf7f0; --card:#fffef9; --ink:#5c5344; --ink-soft:#9d937e;
+  --accent:#c0ae8a; --accent-deep:#a08e6a; --accent-soft:#ece4d2; --line:#e6ddc9;
+}
+html[data-palette="3"]{ /* 薄荷灰绿 */
+  --bg:#e9efe9; --bg2:#f5f8f5; --card:#fcfefc; --ink:#4a5a4e; --ink-soft:#8a9a8e;
+  --accent:#9db8a2; --accent-deep:#7c9c83; --accent-soft:#dde9e0; --line:#d6e2da;
+}
+html[data-palette="4"]{ /* 薰衣草灰紫 */
+  --bg:#efebf2; --bg2:#f8f5fa; --card:#fefcfe; --ink:#544a5e; --ink-soft:#948a9e;
+  --accent:#b0a0c2; --accent-deep:#8f7da4; --accent-soft:#e8e0ee; --line:#e0d8e8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);color:var(--ink);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, var(--accent-soft) 0%, transparent 60%),
+    radial-gradient(1000px 500px at 110% 110%, var(--accent-soft) 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  min-height:100dvh;transition:background .6s ease;
+}
+button{font-family:inherit}
+img{max-width:100%}
+
+/* ============ 顶部导航 ============ */
+header.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px;
+  background:color-mix(in srgb,var(--bg2) 82%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+}
+.brand{font-family:var(--font-serif);font-size:18px;font-weight:700;letter-spacing:1px;color:var(--ink);display:flex;align-items:center;gap:8px;cursor:pointer}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block}
+nav.desk-nav{display:flex;gap:6px}
+nav.desk-nav a{
+  padding:8px 14px;border-radius:999px;font-size:14px;color:var(--ink-soft);
+  text-decoration:none;cursor:pointer;transition:all .25s ease;
+}
+nav.desk-nav a:hover{background:var(--accent-soft);color:var(--accent-deep);transform:translateY(-1px)}
+nav.desk-nav a.active{background:var(--accent);color:#fff}
+nav.desk-nav a.secret-link{display:none}
+body.unlocked nav.desk-nav a.secret-link{display:inline-block;animation:fadeUp .5s ease}
+
+/* ============ 手机底部导航 ============ */
+nav.mob-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;
+  background:color-mix(in srgb,var(--bg2) 90%,transparent);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  justify-content:space-around;
+}
+nav.mob-nav a{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:11px;color:var(--ink-soft);text-decoration:none;cursor:pointer;padding:4px 10px;border-radius:12px;transition:all .25s;
+}
+nav.mob-nav a.active{color:var(--accent-deep);background:var(--accent-soft)}
+nav.mob-nav a .ico{font-size:19px;line-height:1}
+nav.mob-nav a.secret-link{display:none}
+body.unlocked nav.mob-nav a.secret-link{display:flex;animation:fadeUp .5s ease}
+
+/* ============ 主体布局 ============ */
+main{padding:86px 22px 40px;max-width:1080px;margin:0 auto}
+section.page{display:none;animation:fadeUp .45s ease}
+section.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.page-title{font-family:var(--font-serif);font-size:30px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.page-sub{color:var(--ink-soft);font-size:14px;margin-bottom:28px}
+
+/* ============ 按钮（悬停 / 点击 / 提交反馈） ============ */
+.btn{
+  position:relative;overflow:hidden;border:none;cursor:pointer;
+  background:var(--accent);color:#fff;font-size:15px;letter-spacing:1px;
+  padding:12px 26px;border-radius:999px;box-shadow:var(--shadow-soft);
+  transition:transform .2s ease,box-shadow .2s ease,background .2s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow);background:var(--accent-deep)}
+.btn:active{transform:scale(.95)}
+.btn.ghost{background:transparent;color:var(--accent-deep);border:1.5px solid var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn.small{padding:7px 16px;font-size:13px}
+.btn .ripple{
+  position:absolute;border-radius:50%;background:rgba(255,255,255,.55);
+  transform:scale(0);animation:ripple .55s ease-out;pointer-events:none;
+}
+@keyframes ripple{to{transform:scale(3.2);opacity:0}}
+.btn.loading{pointer-events:none;opacity:.85}
+.btn.loading::after{
+  content:"";display:inline-block;width:14px;height:14px;margin-left:8px;
+  border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;vertical-align:-2px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ============ 卡片 ============ */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-soft);padding:22px;transition:transform .25s ease,box-shadow .25s ease;
+}
+.card.hoverable:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+
+/* ============ 首页 ============ */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:52px 20px 40px}
+.hero .names{font-family:var(--font-serif);font-size:clamp(34px,6vw,52px);font-weight:700;letter-spacing:4px;line-height:1.25}
+.hero .names .amp{color:var(--accent);font-size:.7em;margin:0 8px}
+.hero .since{margin-top:14px;color:var(--ink-soft);font-size:15px}
+.hero .days{
+  margin:22px 0 6px;font-family:var(--font-serif);font-size:15px;color:var(--accent-deep);
+  background:var(--accent-soft);padding:10px 26px;border-radius:999px;letter-spacing:2px;
+}
+.hero .days b{font-size:24px;margin:0 4px}
+.hero .cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.hero .hearts{font-size:26px;margin-top:18px;animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}36%{transform:scale(1.12)}}
+.home-latest{margin-top:44px}
+.home-latest h3{font-family:var(--font-serif);font-size:19px;margin-bottom:16px;letter-spacing:2px}
+.latest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.mini-rec{cursor:pointer}
+.mini-rec .d{font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+.mini-rec .t{font-family:var(--font-serif);font-size:16px;margin-bottom:6px}
+.mini-rec .x{font-size:13px;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ============ 时间轴（桌面总览） ============ */
+.timeline-wrap{position:relative;padding:6px 0}
+.timeline-wrap::before{
+  content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;
+  background:linear-gradient(var(--line),var(--accent),var(--line));transform:translateX(-50%);
+}
+.day-block{position:relative;margin-bottom:34px}
+.day-label{
+  position:sticky;top:74px;z-index:5;width:max-content;margin:0 auto 18px;
+  background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:7px 22px;font-family:var(--font-serif);font-size:14px;letter-spacing:2px;
+  color:var(--accent-deep);box-shadow:var(--shadow-soft);
+}
+.day-label .dow{color:var(--ink-soft);margin-left:8px;letter-spacing:0}
+.rec-row{position:relative;display:flex;margin-bottom:20px}
+.rec-row:nth-child(odd) .rec-card{margin-right:auto}
+.rec-row:nth-child(even) .rec-card{margin-left:auto}
+.rec-card{
+  width:calc(50% - 34px);cursor:pointer;position:relative;
+}
+.rec-card::after{
+  content:"";position:absolute;top:26px;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);border:3px solid var(--card);box-shadow:0 0 0 2px var(--accent);
+}
+.rec-row:nth-child(odd) .rec-card::after{right:-40px}
+.rec-row:nth-child(even) .rec-card::after{left:-40px}
+.rec-card .rc-date{font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+.rec-card h4{font-family:var(--font-serif);font-size:18px;margin-bottom:8px}
+.rec-card .rc-text{font-size:14px;color:var(--ink-soft);line-height:1.8;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.rc-imgs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.rc-imgs img{width:86px;height:86px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in}
+.rec-empty{ text-align:center;color:var(--ink-soft);padding:50px 0;font-size:14px}
+
+/* ============ 全屏记录页（手机 / 平板） ============ */
+.pager{display:none}
+.pager-stage{
+  position:relative;height:calc(100dvh - 150px);min-height:430px;
+  background:var(--card);border:1px solid var(--line);border-radius:24px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+  touch-action:pan-y;
+}
+.pager-date{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;
+  background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);
+  padding:6px 18px;border-radius:999px;font-size:13px;letter-spacing:2px;color:var(--accent-deep);
+  white-space:nowrap;font-family:var(--font-serif);
+}
+.pager-body{flex:1;overflow-y:auto;padding:58px 20px 18px;scrollbar-width:none}
+.pager-body::-webkit-scrollbar{display:none}
+.pager-body h3{font-family:var(--font-serif);font-size:21px;margin-bottom:12px;text-align:center}
+.pager-body .ptext{font-size:15px;line-height:2;color:var(--ink);white-space:pre-wrap}
+.pager-imgs-main{width:100%;margin-bottom:14px}
+.pager-imgs-main img{width:100%;max-height:52dvh;object-fit:cover;border-radius:14px;border:1px solid var(--line)}
+.pager-img-strip{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px}
+.pager-img-strip img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:2px solid transparent;flex-shrink:0;cursor:pointer;transition:border .2s}
+.pager-img-strip img.on{border-color:var(--accent)}
+.pager-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 6px 0}
+.pager-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pager-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .3s}
+.pager-dots i.on{background:var(--accent);width:20px;border-radius:4px}
+.arrow-btn{
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--accent-deep);font-size:17px;cursor:pointer;box-shadow:var(--shadow-soft);
+  transition:transform .2s,background .2s;display:flex;align-items:center;justify-content:center;
+}
+.arrow-btn:hover{transform:translateY(-2px);background:var(--accent-soft)}
+.arrow-btn:active{transform:scale(.9)}
+.arrow-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+/* ============ 纪念册 ============ */
+.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px}
+.polaroid{
+  background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 12px 16px;
+  box-shadow:var(--shadow-soft);cursor:pointer;transition:transform .3s ease,box-shadow .3s ease;
+}
+.polaroid:nth-child(3n+1){transform:rotate(-1.2deg)}
+.polaroid:nth-child(3n+2){transform:rotate(.9deg)}
+.polaroid:nth-child(3n){transform:rotate(-.4deg)}
+.polaroid:hover{transform:rotate(0) translateY(-5px) scale(1.02);box-shadow:var(--shadow);z-index:2}
+.polaroid .ph{
+  width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:var(--accent-soft);
+  display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:30px;margin-bottom:12px;
+}
+.polaroid .ph img{width:100%;height:100%;object-fit:cover}
+.polaroid .pt{font-family:var(--font-serif);font-size:16px;margin-bottom:4px}
+.polaroid .pd{font-size:11px;color:var(--ink-soft);margin-bottom:6px}
+.polaroid .px{font-size:13px;color:var(--ink-soft);line-height:1.7;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ============ 悄悄话抽屉（隐藏板块） ============ */
+.secret-wrap{max-width:640px;margin:0 auto}
+.secret-tip{
+  background:var(--accent-soft);border:1px dashed var(--accent);color:var(--accent-deep);
+  border-radius:14px;padding:12px 18px;font-size:13px;margin-bottom:20px;text-align:center;letter-spacing:1px;
+}
+.bubble-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.bubble{max-width:82%;padding:12px 16px;border-radius:16px;position:relative;cursor:pointer;box-shadow:var(--shadow-soft)}
+.bubble.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.bubble.ta{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.bubble .bmeta{font-size:11px;opacity:.75;margin-bottom:4px;display:flex;gap:8px}
+.bubble .btext{font-size:14px;line-height:1.8;white-space:pre-wrap}
+.secret-form{display:flex;flex-direction:column;gap:10px}
+.secret-form .row{display:flex;gap:10px}
+
+/* ============ 上传 / 门禁 ============ */
+.gate{max-width:520px;margin:30px auto;text-align:center;padding:44px 30px}
+.gate .q{font-family:var(--font-serif);font-size:22px;letter-spacing:1px;margin:16px 0 22px}
+.gate input{
+  width:100%;padding:13px 18px;border-radius:14px;border:1.5px solid var(--line);
+  background:var(--bg2);font-size:15px;color:var(--ink);outline:none;transition:border .25s,box-shadow .25s;
+}
+.gate input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.gate .err{color:#c07a7a;font-size:13px;margin-top:12px;min-height:18px}
+.gate .hint{color:var(--ink-soft);font-size:12px;margin-top:14px}
+.upload-form{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.fld label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:6px;letter-spacing:1px}
+.fld input[type=text],.fld input[type=date],.fld textarea,.fld select{
+  width:100%;padding:12px 15px;border-radius:13px;border:1.5px solid var(--line);
+  background:var(--bg2);font-size:14px;color:var(--ink);outline:none;font-family:inherit;
+  transition:border .25s,box-shadow .25s;
+}
+.fld textarea{min-height:110px;resize:vertical;line-height:1.8}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.drop-zone{
+  border:2px dashed var(--line);border-radius:16px;padding:30px 16px;text-align:center;
+  color:var(--ink-soft);font-size:14px;cursor:pointer;transition:all .25s;background:var(--bg2);
+}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-deep)}
+.drop-zone b{color:var(--accent-deep)}
+.pick-list{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pick{width:74px;height:74px;border-radius:10px;overflow:hidden;position:relative;border:1px solid var(--line)}
+.pick img{width:100%;height:100%;object-fit:cover}
+.pick .rm{
+  position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;
+  background:rgba(0,0,0,.55);color:#fff;font-size:11px;cursor:pointer;line-height:1;
+}
+.form-ok{color:var(--accent-deep);font-size:13px;min-height:18px;text-align:center;letter-spacing:1px}
+
+/* ============ 弹层 / 预览 / 编辑 ============ */
+.overlay{
+  position:fixed;inset:0;z-index:100;background:rgba(40,32,32,.45);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.overlay.show{display:flex;animation:fadeUp .3s ease}
+.modal{
+  background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+  width:min(560px,100%);max-height:86dvh;overflow-y:auto;padding:28px;
+}
+.modal h3{font-family:var(--font-serif);font-size:20px;margin-bottom:16px;letter-spacing:1px}
+.modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+.lightbox-img{max-width:92vw;max-height:86dvh;border-radius:14px;box-shadow:var(--shadow)}
+.img-acts{display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap}
+.edit-note{font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+
+/* ============ 解锁过渡动画 ============ */
+#unlockFx{
+  position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:22px;background:var(--bg2);overflow:hidden;
+}
+#unlockFx.show{display:flex}
+#unlockFx .ring{
+  position:absolute;border-radius:50%;border:2px solid var(--accent-soft);
+  animation:ringOut 1.4s ease-out forwards;
+}
+@keyframes ringOut{from{width:40px;height:40px;opacity:1}to{width:130vmax;height:130vmax;opacity:0}}
+#unlockFx .big-heart{font-size:70px;animation:beat 1s ease-in-out infinite;z-index:2}
+#unlockFx .fx-text{font-family:var(--font-serif);font-size:19px;letter-spacing:4px;color:var(--accent-deep);z-index:2;animation:fadeUp .8s ease}
+
+/* ============ Toast ============ */
+#toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);z-index:300;
+  background:var(--ink);color:var(--bg2);padding:11px 22px;border-radius:999px;font-size:14px;
+  opacity:0;pointer-events:none;transition:all .35s ease;letter-spacing:1px;max-width:86vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ 响应式：手机 / 平板 全屏记录页，桌面时间轴总览 ============ */
+@media (max-width:1023px){
+  nav.desk-nav{display:none}
+  nav.mob-nav{display:flex}
+  main{padding:80px 16px calc(96px + env(safe-area-inset-bottom))}
+  .page-title{font-size:24px}
+  .desk-only{display:none!important}
+  .pager{display:block}
+  .pager-sec-title{font-family:var(--font-serif);font-size:17px;letter-spacing:2px;margin-bottom:12px;color:var(--ink-soft);text-align:center}
+}
+@media (min-width:1024px){
+  .mob-only{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand" onclick="go('home')"><span class="dot"></span>珊珊和萌萌的小基地</div>
+  <nav class="desk-nav">
+    <a data-nav="home" onclick="go('home')">首页</a>
+    <a data-nav="timeline" onclick="go('timeline')">时间轴</a>
+    <a data-nav="album" onclick="go('album')">纪念册</a>
+    <a data-nav="secret" class="secret-link" onclick="go('secret')">悄悄话抽屉</a>
+    <a data-nav="upload" onclick="go('upload')">上传</a>
+  </nav>
+</header>
+
+<nav class="mob-nav">
+  <a data-nav="home" onclick="go('home')"><span class="ico">🏡</span>首页</a>
+  <a data-nav="timeline" onclick="go('timeline')"><span class="ico">🕰️</span>时间轴</a>
+  <a data-nav="album" onclick="go('album')"><span class="ico">📷</span>纪念册</a>
+  <a data-nav="secret" class="secret-link" onclick="go('secret')"><span class="ico">🗝️</span>悄悄话</a>
+  <a data-nav="upload" onclick="go('upload')"><span class="ico">✒️</span>上传</a>
+</nav>
+
+<main>
+  <!-- 首页 -->
+  <section class="page" id="page-home">
+    <div class="hero">
+      <div class="names">珊珊<span class="amp">&amp;</span>萌萌<small style="font-size:.42em;display:block;letter-spacing:6px;color:var(--ink-soft);margin-top:10px">的小基地</small></div>
+      <div class="since">我们的故事，从 2025 年 12 月 1 日那个放学的路口开始</div>
+      <div class="days">在一起第 <b id="dayCount">0</b> 天</div>
+      <div class="hearts">💗</div>
+      <div class="cta">
+        <button class="btn" onclick="go('timeline')">翻开我们的故事</button>
+        <button class="btn ghost" onclick="go('album')">看看纪念册</button>
+      </div>
+    </div>
+    <div class="home-latest">
+      <h3>最近的记录</h3>
+      <div class="latest-grid" id="latestGrid"></div>
+    </div>
+  </section>
+
+  <!-- 时间轴 -->
+  <section class="page" id="page-timeline">
+    <div class="desk-only">
+      <div class="page-title">时间轴</div>
+      <div class="page-sub">按日子串起来的每一件事 · 点击任意内容可以直接编辑（需先在上传处回答问题解锁）</div>
+      <div class="timeline-wrap" id="timelineDesk"></div>
+    </div>
+    <div class="pager mob-only">
+      <div class="pager-sec-title">🕰️ 时间轴 · 左右滑动翻页</div>
+      <div class="pager-stage" id="tlPagerStage">
+        <div class="pager-date" id="tlPagerDate"></div>
+        <div class="pager-body" id="tlPagerBody"></div>
+      </div>
+      <div class="pager-nav">
+        <button class="arrow-btn" id="tlPrev" onclick="pagerStep('timeline',-1)">‹</button>
+        <div class="pager-dots" id="tlDots"></div>
+        <button class="arrow-btn" id="tlNext" onclick="pagerStep('timeline',1)">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 纪念册 -->
+  <section class="page" id="page-album">
+    <div class="desk-only">
+      <div class="page-title">纪念册</div>
+      <div class="page-sub">拍立得墙 · 点击照片或文字可以直接编辑（需先解锁）</div>
+      <div class="album-grid" id="albumGrid"></div>
+    </div>
+    <div class="pager mob-only">
+      <div class="pager-sec-title">📷 纪念册 · 左右滑动翻页</div>
+      <div class="pager-stage" id="alPagerStage">
+        <div class="pager-date" id="alPagerDate"></div>
+        <div class="pager-body" id="alPagerBody"></div>
+      </div>
+      <div class="pager-nav">
+        <button class="arrow-btn" id="alPrev" onclick="pagerStep('album',-1)">‹</button>
+        <div class="pager-dots" id="alDots"></div>
+        <button class="arrow-btn" id="alNext" onclick="pagerStep('album',1)">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 悄悄话抽屉（默认隐藏板块，解锁后可见） -->
+  <section class="page" id="page-secret">
+    <div class="secret-wrap">
+      <div class="page-title">悄悄话抽屉</div>
+      <div class="page-sub">只属于我们两个人的小抽屉 · 外人看不到这里</div>
+      <div class="secret-tip">🗝️ 这里可以放吵架的经过、道歉的小纸条、和好的约定 —— 写下来，就翻篇啦。</div>
+      <div class="bubble-list" id="secretList"></div>
+      <div class="card secret-form">
+        <div class="row">
+          <div class="fld" style="flex:1">
+            <label>谁在写</label>
+            <select id="secretFrom"><option>珊珊</option><option>萌萌</option></select>
+          </div>
+          <div class="fld" style="flex:1.2">
+            <label>日期</label>
+            <input type="date" id="secretDate">
+          </div>
+        </div>
+        <div class="fld">
+          <label>写点悄悄话</label>
+          <textarea id="secretText" placeholder="今天因为什么不开心？想说什么…"></textarea>
+        </div>
+        <button class="btn" id="secretSubmit" onclick="submitSecret(this)">塞进抽屉</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 上传 / 门禁 -->
+  <section class="page" id="page-upload">
+    <div id="gateBox">
+      <div class="card gate">
+        <div style="font-size:34px">🔒</div>
+        <div class="q">我们是什么时候在一起的？</div>
+        <input type="text" id="gateInput" placeholder="写下那一刻…" autocomplete="off">
+        <div class="err" id="gateErr"></div>
+        <button class="btn" id="gateBtn" onclick="tryUnlock(this)">解锁小基地</button>
+        <div class="hint">答对后即可上传内容、编辑时间轴与纪念册，并开启隐藏的悄悄话抽屉</div>
+      </div>
+    </div>
+    <div id="uploadBox" style="display:none">
+      <div class="page-title">上传新记录</div>
+      <div class="page-sub">可以往时间轴、纪念册、悄悄话抽屉里添加图片或文字 · 单张图片最大 50MB</div>
+      <div class="card upload-form">
+        <div class="row" style="display:flex;gap:12px;flex-wrap:wrap">
+          <div class="fld" style="flex:1;min-width:150px">
+            <label>放到哪个板块</label>
+            <select id="upTarget" onchange="onTargetChange()">
+              <option value="timeline">🕰️ 时间轴</option>
+              <option value="album">📷 纪念册</option>
+              <option value="secret">🗝️ 悄悄话抽屉</option>
+            </select>
+          </div>
+          <div class="fld" style="flex:1;min-width:150px">
+            <label>日期</label>
+            <input type="date" id="upDate">
+          </div>
+        </div>
+        <div class="fld">
+          <label>标题</label>
+          <input type="text" id="upTitle" placeholder="给这段回忆起个名字">
+        </div>
+        <div class="fld">
+          <label>想记下的话</label>
+          <textarea id="upText" placeholder="今天发生了什么…"></textarea>
+        </div>
+        <div class="fld">
+          <label>图片（可多选，单张最大 50MB）</label>
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('upFiles').click()">
+            点击选择图片，或把图片拖到这里<br><b id="dzSub">支持 JPG / PNG / GIF / WEBP</b>
+          </div>
+          <input type="file" id="upFiles" accept="image/*" multiple hidden>
+          <div class="pick-list" id="pickList"></div>
+        </div>
+        <button class="btn" id="upSubmit" onclick="submitUpload(this)">保存这条记录</button>
+        <div class="form-ok" id="upOk"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 解锁过渡动画 -->
+<div id="unlockFx">
+  <div class="big-heart">💗</div>
+  <div class="fx-text">欢迎回家 · 带你去纪念册看看</div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <h3>✏️ 编辑这条记录</h3>
+    <div class="edit-note" id="editWhere"></div>
+    <div class="fld" style="margin-bottom:12px"><label>日期</label><input type="date" id="editDate"></div>
+    <div class="fld" style="margin-bottom:12px"><label>标题</label><input type="text" id="editTitle"></div>
+    <div class="fld"><label>内容</label><textarea id="editText" style="min-height:140px"></textarea></div>
+    <div class="fld" style="margin-top:12px">
+      <label>图片（点图可预览）</label>
+      <div class="pick-list" id="editPicks"></div>
+      <button class="btn ghost small" style="margin-top:10px" onclick="document.getElementById('editAddFile').click()">＋ 补传图片</button>
+      <input type="file" id="editAddFile" accept="image/*" multiple hidden>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="closeOverlay('editOverlay')">取消</button>
+      <button class="btn" style="background:#c07a7a" onclick="deleteRecord()">删除整条</button>
+      <button class="btn" id="editSave" onclick="saveEdit(this)">保存修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- 图片预览弹窗 -->
+<div class="overlay" id="imgOverlay">
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <img class="lightbox-img" id="lightboxImg" alt="">
+    <div class="img-acts" id="imgActs"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= 配置 ================= */
+const PASS_ANSWER = "20251201放学分别的路口";   // 门禁答案（完全匹配）
+const MAX_IMG_MB  = 50;                          // 单张图片上限（已从 8MB 提高）
+const SINCE = "2025-12-01";
+const PALETTE_N = 5;
+
+/* ================= 每次访问随机一套低饱和配色，本次访问保持一致 ================= */
+(function initPalette(){
+  let p = sessionStorage.getItem("ssmm_palette");
+  if(p === null){ p = Math.floor(Math.random()*PALETTE_N); sessionStorage.setItem("ssmm_palette", p); }
+  document.documentElement.setAttribute("data-palette", p);
+})();
+
+/* ================= 存储层：文字记录 localStorage + 图片 IndexedDB ================= */
+const LS_KEY = "ssmm_records_v1";
+let db = null;
+function idb(){
+  return db ? Promise.resolve(db) : new Promise((res,rej)=>{
+    const r = indexedDB.open("ssmm_base",1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore("images");
+    r.onsuccess = e => { db = e.target.result; res(db); };
+    r.onerror = () => rej(r.error);
+  });
+}
+async function imgPut(id, blob){ const d=await idb(); return new Promise((res,rej)=>{const t=d.transaction("images","readwrite");t.objectStore("images").put(blob,id);t.oncomplete=res;t.onerror=()=>rej(t.error);}); }
+async function imgGet(id){ const d=await idb(); return new Promise((res)=>{const t=d.transaction("images");const q=t.objectStore("images").get(id);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);}); }
+async function imgDel(id){ const d=await idb(); return new Promise((res)=>{const t=d.transaction("images","readwrite");t.objectStore("images").delete(id);t.oncomplete=res;}); }
+
+let store = { timeline:[], album:[], secret:[] };
+function loadStore(){
+  try{ const s = JSON.parse(localStorage.getItem(LS_KEY)); if(s && s.timeline) store = s; }catch(e){}
+  if(!localStorage.getItem(LS_KEY)) seedData();
+}
+function saveStore(){ localStorage.setItem(LS_KEY, JSON.stringify(store)); }
+function seedData(){
+  store = {
+    timeline:[
+      {id:"seed1",date:"2025-12-01",title:"一切的开始",text:"放学的路口，晚风刚刚好。就是在那里，我们正式在一起了。以后的每年今天，都要回来看看。",images:[],createdAt:1},
+      {id:"seed2",date:"2025-12-08",title:"第一杯奶茶",text:"你把最后一口珍珠留给了我。原来被人惦记是这种感觉。",images:[],createdAt:2},
+      {id:"seed3",date:"2025-12-20",title:"第一次一起看日落",text:"什么都没说，但好像什么都说了。",images:[],createdAt:3}
+    ],
+    album:[
+      {id:"seda1",date:"2025-12-01",title:"第一页",text:"纪念册的第一页，留给我们相遇的路口。照片以后补上～",images:[],createdAt:1}
+    ],
+    secret:[]
+  };
+  saveStore();
+}
+
+/* ================= 工具 ================= */
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const isUnlocked = () => sessionStorage.getItem("ssmm_unlocked") === "1";
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove("show"),2400); }
+function esc(s){ return (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function fmtDate(d){
+  if(!d) return "";
+  const [y,m,dd]=d.split("-").map(Number);
+  const dow="日一二三四五六"[new Date(y,m-1,dd).getDay()];
+  return `${y} 年 ${m} 月 ${dd} 日 · 周${dow}`;
+}
+function sortByDate(arr){ return arr.slice().sort((a,b)=> (a.date||"").localeCompare(b.date||"") || (a.createdAt||0)-(b.createdAt||0)); }
+
+/* 按钮涟漪 */
+document.addEventListener("click", e=>{
+  const b = e.target.closest(".btn"); if(!b) return;
+  const r = b.getBoundingClientRect(), s = document.createElement("span");
+  const size = Math.max(r.width, r.height);
+  s.className="ripple";
+  s.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+  b.appendChild(s); setTimeout(()=>s.remove(), 600);
+});
+
+/* ================= 图片对象 URL 缓存 ================= */
+const urlCache = {};
+async function imgUrl(id){
+  if(urlCache[id]) return urlCache[id];
+  const blob = await imgGet(id);
+  if(!blob) return null;
+  urlCache[id] = URL.createObjectURL(blob);
+  return urlCache[id];
+}
+
+/* ================= 路由 ================= */
+let curPage = "home";
+function go(name){
+  curPage = name;
+  document.querySelectorAll("section.page").forEach(s=>s.classList.remove("active"));
+  $("page-"+name).classList.add("active");
+  document.querySelectorAll("[data-nav]").forEach(a=>a.classList.toggle("active", a.dataset.nav===name));
+  window.scrollTo({top:0});
+  history.replaceState(null,"","#"+name);
+  if(name==="secret" && !isUnlocked()) go("upload");
+  if(name==="timeline" || name==="album") renderPager(name);
+}
+function requireUnlock(msg){
+  if(isUnlocked()) return true;
+  toast(msg || "先到「上传」回答问题解锁哦");
+  return false;
+}
+
+/* ================= 渲染：首页 ================= */
+function daysSince(){
+  const now = new Date(); const start = new Date(2025,11,1);
+  return Math.max(0, Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()) - start)/86400000));
+}
+async function renderHome(){
+  $("dayCount").textContent = daysSince();
+  const all = sortByDate([...store.timeline, ...store.album]).reverse().slice(0,3);
+  const g = $("latestGrid");
+  if(!all.length){ g.innerHTML = `<div class="rec-empty" style="grid-column:1/-1">还没有记录，快去上传第一条吧</div>`; return; }
+  g.innerHTML = all.map(r=>`
+    <div class="card hoverable mini-rec" onclick="openEdit('${r.id}','${r.sec}')">
+      <div class="d">${fmtDate(r.date)}</div>
+      <div class="t">${esc(r.title)||"（无标题）"}</div>
+      <div class="x">${esc(r.text)}</div>
+    </div>`).join("");
+}
+
+/* ================= 渲染：桌面时间轴（整数日分割 + 统一日期标注） ================= */
+async function renderTimeline(){
+  const list = sortByDate(store.timeline);
+  const wrap = $("timelineDesk");
+  if(!list.length){ wrap.innerHTML = `<div class="rec-empty">时间轴还空着，去上传第一条记录吧</div>`; return; }
+  let html = "", lastDay = "";
+  for(const r of list){
+    if(r.date !== lastDay){
+      lastDay = r.date;
+      html += `<div class="day-label">${fmtDate(r.date)}</div>`;
+    }
+    const imgs = await Promise.all((r.images||[]).map(imgUrl));
+    html += `
+      <div class="rec-row">
+        <div class="card hoverable rec-card" onclick="openEdit('${r.id}','timeline')">
+          <div class="rc-date">${fmtDate(r.date)}</div>
+          <h4>${esc(r.title)||"（无标题）"}</h4>
+          ${r.text?`<div class="rc-text">${esc(r.text)}</div>`:""}
+          ${imgs.filter(Boolean).length?`<div class="rc-imgs">${imgs.filter(Boolean).map(u=>`<img src="${u}" onclick="event.stopPropagation();viewImage('${r.id}','timeline',this.src)">`).join("")}</div>`:""}
+        </div>
+      </div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+/* ================= 渲染：纪念册 ================= */
+async function renderAlbum(){
+  const list = sortByDate(store.album);
+  const grid = $("albumGrid");
+  if(!list.length){ grid.innerHTML = `<div class="rec-empty" style="grid-column:1/-1">纪念册还是空的，上传第一张照片吧</div>`; return; }
+  let html = "";
+  for(const r of list){
+    const u0 = r.images && r.images.length ? await imgUrl(r.images[0]) : null;
+    html += `
+      <div class="polaroid" onclick="openEdit('${r.id}','album')">
+        <div class="ph">${u0?`<img src="${u0}" onclick="event.stopPropagation();viewImage('${r.id}','album','${u0}')">`:"📷"}</div>
+        <div class="pt">${esc(r.title)||"（无标题）"}</div>
+        <div class="pd">${fmtDate(r.date)}</div>
+        ${r.text?`<div class="px">${esc(r.text)}</div>`:""}
+      </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+/* ================= 渲染：悄悄话抽屉 ================= */
+async function renderSecret(){
+  const list = sortByDate(store.secret);
+  const box = $("secretList");
+  if(!list.length){ box.innerHTML = `<div class="rec-empty">抽屉还是空的，写下第一张小纸条吧</div>`; return; }
+  box.innerHTML = "";
+  for(const r of list){
+    const me = r.title === "珊珊"; // 珊珊在右，萌萌在左
+    const div = document.createElement("div");
+    div.className = "bubble " + (me?"me":"ta");
+    div.innerHTML = `<div class="bmeta"><span>${esc(r.title)}</span><span>${fmtDate(r.date)}</span></div><div class="btext">${esc(r.text)}</div>`;
+    div.onclick = () => openEdit(r.id, "secret");
+    box.appendChild(div);
+  }
+}
+
+/* ================= 手机 / 平板：全屏记录页 ================= */
+const pagerState = { timeline:{list:[],i:0}, album:{list:[],i:0} };
+async function renderPager(sec){
+  const st = pagerState[sec];
+  st.list = sortByDate(store[sec]);
+  if(!st.i || st.i >= st.list.length) st.i = Math.max(0, st.list.length-1); // 默认停留在最新一条
+  await paintPager(sec);
+}
+async function paintPager(sec){
+  const st = pagerState[sec];
+  const body = $(sec==="timeline"?"tlPagerBody":"alPagerBody");
+  const dateEl = $(sec==="timeline"?"tlPagerDate":"alPagerDate");
+  const dots = $(sec==="timeline"?"tlDots":"alDots");
+  const prev = $(sec==="timeline"?"tlPrev":"alPrev");
+  const next = $(sec==="timeline"?"tlNext":"alNext");
+  if(!st.list.length){
+    dateEl.textContent = "还没有记录";
+    body.innerHTML = `<div class="rec-empty" style="margin-top:40%">去「上传」添加第一条吧</div>`;
+    dots.innerHTML=""; prev.disabled = next.disabled = true; return;
+  }
+  const r = st.list[st.i];
+  dateEl.textContent = `${st.i+1} / ${st.list.length} · ${fmtDate(r.date)}`;
+  const urls = (await Promise.all((r.images||[]).map(imgUrl))).filter(Boolean);
+  let mainImg = "";
+  if(urls.length){
+    mainImg = `<div class="pager-imgs-main"><img id="${sec}MainImg" src="${urls[0]}" onclick="viewImage('${r.id}','${sec}',this.src)"></div>`;
+    if(urls.length>1) mainImg += `<div class="pager-img-strip">${urls.map((u,i)=>`<img src="${u}" class="${i===0?"on":""}" onclick="swapMain('${sec}',this,'${u}')">`).join("")}</div>`;
+  }
+  body.innerHTML = `
+    ${r.title?`<h3>${esc(r.title)}</h3>`:""}
+    ${mainImg}
+    ${r.text?`<div class="ptext">${esc(r.text)}</div>`:""}
+    <div style="text-align:center;margin-top:18px"><button class="btn ghost small" onclick="openEdit('${r.id}','${sec}')">✏️ 编辑这条</button></div>`;
+  dots.innerHTML = st.list.map((_,i)=>`<i class="${i===st.i?"on":""}" onclick="pagerJump('${sec}',${i})"></i>`).join("");
+  prev.disabled = st.i===0; next.disabled = st.i===st.list.length-1;
+}
+function swapMain(sec, thumb, url){
+  $(sec==="timeline"?"tlMainImg":"alMainImg").src = url;
+  thumb.parentElement.querySelectorAll("img").forEach(x=>x.classList.remove("on"));
+  thumb.classList.add("on");
+}
+function pagerStep(sec,d){ const st=pagerState[sec]; const n=st.i+d; if(n<0||n>=st.list.length) return; st.i=n; paintPager(sec); }
+function pagerJump(sec,i){ pagerState[sec].i=i; paintPager(sec); }
+/* 触摸滑动翻页 */
+["tlPagerStage","alPagerStage"].forEach(id=>{
+  let sx=0;
+  const el = $(id);
+  el.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});
+  el.addEventListener("touchend",e=>{
+    const dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 48) pagerStep(id.startsWith("tl")?"timeline":"album", dx<0?1:-1);
+  },{passive:true});
+});
+
+/* ================= 门禁 & 解锁动画 ================= */
+function tryUnlock(btn){
+  const v = $("gateInput").value.trim();
+  const err = $("gateErr");
+  if(v === PASS_ANSWER){
+    btn.classList.add("loading");
+    setTimeout(()=>{
+      btn.classList.remove("loading");
+      sessionStorage.setItem("ssmm_unlocked","1");
+      document.body.classList.add("unlocked");
+      const fx = $("unlockFx");
+      fx.innerHTML = "";
+      for(let i=0;i<3;i++){
+        const ring=document.createElement("div"); ring.className="ring";
+        ring.style.animationDelay = (i*0.18)+"s";
+        fx.appendChild(ring);
+      }
+      const h=document.createElement("div"); h.className="big-heart"; h.textContent="💗";
+      const t=document.createElement("div"); t.className="fx-text"; t.textContent="答对啦 · 带你去纪念册看看";
+      fx.appendChild(h); fx.appendChild(t);
+      fx.classList.add("show");
+      setTimeout(()=>{
+        fx.classList.remove("show");
+        showUploadForm();
+        go("album");
+        toast("已解锁 · 悄悄话抽屉也打开了");
+      }, 1600);
+    }, 600);
+  }else{
+    err.textContent = v ? "好像不对哦，再想想那个路口…" : "先写下答案吧";
+    const gate = document.querySelector(".gate");
+    gate.classList.remove("shake"); void gate.offsetWidth; gate.classList.add("shake");
+  }
+}
+function showUploadForm(){
+  $("gateBox").style.display = "none";
+  $("uploadBox").style.display = "block";
+}
+
+/* ================= 上传 ================= */
+let pendingFiles = []; // {id, blob, url}
+function onTargetChange(){
+  const t = $("upTarget").value;
+  $("upTitle").placeholder = t==="secret" ? "谁在写（珊珊 / 萌萌）" : "给这段回忆起个名字";
+}
+$("upFiles").addEventListener("change", e=>addFiles(e.target.files));
+const dz = $("dropZone");
+dz.addEventListener("dragover", e=>{e.preventDefault();dz.classList.add("drag");});
+dz.addEventListener("dragleave", ()=>dz.classList.remove("drag"));
+dz.addEventListener("drop", e=>{e.preventDefault();dz.classList.remove("drag");addFiles(e.dataTransfer.files);});
+function addFiles(fileList){
+  for(const f of fileList){
+    if(!f.type.startsWith("image/")){ toast(`「${f.name}」不是图片，已跳过`); continue; }
+    if(f.size > MAX_IMG_MB*1024*1024){ toast(`「${f.name}」超过 ${MAX_IMG_MB}MB 上限`); continue; }
+    const id = uid();
+    pendingFiles.push({id, blob:f, url:URL.createObjectURL(f)});
+  }
+  renderPicks();
+  $("dzSub").textContent = `已选 ${pendingFiles.length} 张 · 单张最大 ${MAX_IMG_MB}MB`;
+}
+function renderPicks(){
+  $("pickList").innerHTML = pendingFiles.map(p=>`
+    <div class="pick"><img src="${p.url}"><button class="rm" onclick="removePick('${p.id}')">✕</button></div>`).join("");
+}
+function removePick(id){ pendingFiles = pendingFiles.filter(p=>p.id!==id); renderPicks(); }
+
+async function submitUpload(btn){
+  const sec = $("upTarget").value;
+  const date = $("upDate").value || new Date().toISOString().slice(0,10);
+  const title = $("upTitle").value.trim();
+  const text = $("upText").value.trim();
+  if(!title && !text && !pendingFiles.length){ toast("写点什么或选张图片吧"); return; }
+  if(sec==="secret" && !title){ toast("悄悄话请填「谁在写」"); return; }
+  btn.classList.add("loading");
+  for(const p of pendingFiles){ await imgPut(p.id, p.blob); }
+  const rec = { id:uid(), date, title, text, images:pendingFiles.map(p=>p.id), createdAt:Date.now() };
+  store[sec].push(rec); saveStore();
+  await new Promise(r=>setTimeout(r,500));
+  btn.classList.remove("loading");
+  btn.textContent = "✓ 已保存";
+  $("upOk").textContent = "已保存！可以继续添加，或去对应板块看看～";
+  setTimeout(()=>{ btn.textContent="保存这条记录"; $("upOk").textContent=""; }, 2600);
+  pendingFiles = []; renderPicks(); $("upFiles").value="";
+  ["upTitle","upText"].forEach(i=>$(i).value="");
+  await Promise.all([renderHome(), renderTimeline(), renderAlbum(), renderSecret(), renderPager(sec)]);
+  toast(sec==="secret" ? "已经塞进悄悄话抽屉啦" : "保存成功！");
+}
+
+/* 悄悄话快捷提交（板块内直接新增） */
+async function submitSecret(btn){
+  const from = $("secretFrom").value;
+  const date = $("secretDate").value || new Date().toISOString().slice(0,10);
+  const text = $("secretText").value.trim();
+  if(!text){ toast("写点什么再塞进来吧"); return; }
+  btn.classList.add("loading");
+  await new Promise(r=>setTimeout(r,400));
+  btn.classList.remove("loading");
+  store.secret.push({id:uid(),date,title:from,text,images:[],createdAt:Date.now()});
+  saveStore(); $("secretText").value="";
+  await renderSecret();
+  toast("小纸条已塞进抽屉");
+}
+
+/* ================= 图片预览 ================= */
+let viewing = null; // {recId, sec, url, imgId}
+async function viewImage(recId, sec, url){
+  const r = store[sec].find(x=>x.id===recId);
+  const imgId = r && r.images.find(i=>urlCache[i]===url);
+  viewing = {recId, sec, url, imgId};
+  $("lightboxImg").src = url;
+  $("imgActs").innerHTML = isUnlocked() ? `
+    <button class="btn ghost small" onclick="replaceImage()">替换这张</button>
+    <button class="btn small" style="background:#c07a7a" onclick="deleteImage()">删除这张</button>
+    <button class="btn ghost small" onclick="closeOverlay('imgOverlay')">关闭</button>` : "";
+  $("imgOverlay").classList.add("show");
+}
+async function replaceImage(){
+  if(!viewing) return;
+  const inp = document.createElement("input"); inp.type="file"; inp.accept="image/*";
+  inp.onchange = async ()=>{
+    const f = inp.files[0]; if(!f) return;
+    if(f.size > MAX_IMG_MB*1024*1024){ toast(`超过 ${MAX_IMG_MB}MB 上限`); return; }
+    const nid = uid();
+    await imgPut(nid, f);
+    const r = store[viewing.sec].find(x=>x.id===viewing.recId);
+    const idx = r.images.indexOf(viewing.imgId);
+    if(idx>-1) r.images[idx] = nid;
+    await imgDel(viewing.imgId); delete urlCache[viewing.imgId];
+    saveStore(); closeOverlay("imgOverlay");
+    await refreshAll();
+    toast("图片已替换");
+  };
+  inp.click();
+}
+async function deleteImage(){
+  if(!viewing) return;
+  const r = store[viewing.sec].find(x=>x.id===viewing.recId);
+  r.images = r.images.filter(i=>i!==viewing.imgId);
+  await imgDel(viewing.imgId); delete urlCache[viewing.imgId];
+  saveStore(); closeOverlay("imgOverlay");
+  await refreshAll();
+  toast("图片已删除");
+}
+
+/* ================= 点击编辑（纪念册 & 时间轴 & 悄悄话） ================= */
+let editing = null; // {recId, sec}
+function openEdit(recId, sec){
+  if(!requireUnlock("先到「上传」回答问题，才能编辑哦")){ go("upload"); return; }
+  const r = store[sec].find(x=>x.id===recId); if(!r) return;
+  editing = {recId, sec};
+  const whereName = {timeline:"时间轴", album:"纪念册", secret:"悄悄话抽屉"}[sec];
+  $("editWhere").textContent = `正在编辑「${whereName}」里的一条记录`;
+  $("editDate").value = r.date || "";
+  $("editTitle").value = r.title || "";
+  $("editText").value = r.text || "";
+  const picks = $("editPicks");
+  picks.innerHTML = (r.images||[]).length ? "" : `<span style="font-size:12px;color:var(--ink-soft)">这条记录暂无图片</span>`;
+  (r.images||[]).forEach(async id=>{
+    const u = await imgUrl(id); if(!u) return;
+    const d = document.createElement("div");
+    d.className="pick"; d.innerHTML = `<img src="${u}">`;
+    d.querySelector("img").onclick = ()=>viewImage(recId, sec, u);
+    picks.appendChild(d);
+  });
+  $("editOverlay").classList.add("show");
+}
+$("editAddFile").addEventListener("change", async e=>{
+  if(!editing) return;
+  const r = store[editing.sec].find(x=>x.id===editing.recId); if(!r) return;
+  for(const f of e.target.files){
+    if(!f.type.startsWith("image/")) continue;
+    if(f.size > MAX_IMG_MB*1024*1024){ toast(`「${f.name}」超过 ${MAX_IMG_MB}MB`); continue; }
+    const nid = uid(); await imgPut(nid, f); r.images.push(nid);
+  }
+  saveStore();
+  openEdit(editing.recId, editing.sec); // 刷新弹窗
+  toast("图片已补传");
+});
+async function saveEdit(btn){
+  if(!editing) return;
+  const r = store[editing.sec].find(x=>x.id===editing.recId); if(!r) return;
+  btn.classList.add("loading");
+  r.date = $("editDate").value || r.date;
+  r.title = $("editTitle").value.trim();
+  r.text = $("editText").value.trim();
+  await new Promise(res=>setTimeout(res,450));
+  btn.classList.remove("loading"); btn.textContent="✓ 已保存";
+  saveStore(); await refreshAll();
+  setTimeout(()=>{ btn.textContent="保存修改"; closeOverlay("editOverlay"); toast("修改已保存"); }, 500);
+}
+async function deleteRecord(){
+  if(!editing) return;
+  const r = store[editing.sec].find(x=>x.id===editing.recId);
+  if(!r) return;
+  if(!confirm("确定删除这条记录吗？")) return;
+  for(const iid of (r.images||[])){ await imgDel(iid); delete urlCache[iid]; }
+  store[editing.sec] = store[editing.sec].filter(x=>x.id!==editing.recId);
+  saveStore(); closeOverlay("editOverlay");
+  await refreshAll();
+  toast("已删除");
+}
+function closeOverlay(id){ $(id).classList.remove("show"); }
+document.querySelectorAll(".overlay").forEach(o=>{
+  o.addEventListener("click", e=>{ if(e.target===o) o.classList.remove("show"); });
+});
+
+/* ================= 全量刷新 ================= */
+async function refreshAll(){
+  await Promise.all([renderHome(), renderTimeline(), renderAlbum(), renderSecret(), renderPager("timeline"), renderPager("album")]);
+}
+
+/* ================= 启动 ================= */
+loadStore();
+if(isUnlocked()){ document.body.classList.add("unlocked"); showUploadForm(); }
+$("upDate").value = new Date().toISOString().slice(0,10);
+$("secretDate").value = new Date().toISOString().slice(0,10);
+onTargetChange();
+refreshAll().then(()=>{
+  const h = location.hash.replace("#","") || "home";
+  go(["home","timeline","album","secret","upload"].includes(h) ? h : "home");
+});
+</script>
+</body>
+</html>
